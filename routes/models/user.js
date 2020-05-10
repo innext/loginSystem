@@ -31,15 +31,19 @@ var UserSchema = mongoose.Schema({
     }
 });
 
-// this to get the candidates Password then hash it and check if it match
+// this is to convert this UserSchema in a usable model called User
 var User = mongoose.model('User', UserSchema);
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema); // then this export the model User so it can be used outside this file.
 
-module.exports.comparePassword = function(candidatePassword, hash, callback){
-    bcrypt.compare(candidatePassword, hash, function(err, isMatch){
-        if(err) return callback(err);
-        callback(null, isMatch);
-    });
+// this is to save user and hash the password for the new user created in the users.js file
+module.exports.createUser = function(newUser, callback){
+        bcrypt.hash(newUser.password, 15, function(err, hash){ // this is to call the newUser's password and hash it with 15 saltrounds
+            if(err) throw err;
+            // set hashed password
+            newUser.password = hash; // this is to replace the password of the newUser and replace with the hashed one
+            // create User or save the user to MongoDB
+            newUser.save(callback);
+        });
 };
 
 // this is to find user by id
@@ -53,14 +57,9 @@ module.exports.getUserByUsername = function(username, callback){
     User.findOne(query, callback);
 };
 
-// this is to create user and hash the password for the new user
-module.exports.createUser = function(newUser, callback){
-        bcrypt.hash(newUser.password, 15, function(err, hash){
-            if(err) throw err;
-            // set hashed password
-            newUser.password = hash;
-            // create User
-            newUser.save(callback);
-        });
+module.exports.comparePassword = function(candidatePassword, hash, callback){
+    bcrypt.compare(candidatePassword, hash, function(err, isMatch){
+        if(err) return callback(err);
+        callback(null, isMatch);
+    });
 };
-

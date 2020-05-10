@@ -43,7 +43,7 @@ app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({extended: true}));
 // Handle Express Sessions
 app.use(require('express-session')({
-  secret: 'mysecret', // this is wrong, it should be in a file and make req to the file and when pushing to github should not be pushed along e.g "var secret = require('./config/secret');"
+  secret: 'mysecret', // this is wrong, it should be in a file and make req to the file and when pushing to github should not be pushed along e.g "var secret = require('/node_modules/config/secret');"
   saveUninitialized: true,
   resave: true
 }));

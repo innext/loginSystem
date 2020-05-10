@@ -92,6 +92,8 @@ router.post('/register', function(req, res, next) {
     User.createUser(newUser, function(err, user){
       if(err) throw err;
       console.log(user);
+      console.log(`${password}`);
+      console.log(user.password);
     });
     // end of creation of new user
     // sucess message to tell the user, user was created
@@ -114,14 +116,46 @@ router.get('/login', function(req, res, next) {
 // use passport to authentictae the user after getting the user from the DB
 // and if the user is not found in DB or it failed maybe because incorrect PW send Invalid username or password
 router.post('/login', passport.authenticate('local', {failureRedirect:'/users/login', failureFlash:'Invalid username or password'}), function(req, res){
+  //passport.authenticate is telling passport to authenticate the user locally and err msg and redirect if was unable to authenticate user
   console.log('Authentication Successful');
   req.flash('success', 'You are logged in');
   res.redirect('/');
 }); //end of POST /login
 
-// this is to use passport to connect to DB to check Users id
+// this is to authenticate the user from POST req of /login, it takes 
+// its username and finds in DB if find then picks password and compare with that of DB
+// else tells unknow user if not found and invalid password if password != DB password
+passport.use(new localStrategy( // localStrategy is what we using to check user in later we use facebook, twitter, linkedin
+  function(username, password, done){
+    User.getUserByUsername(username, function(err, user){ // username here is the one that getUserByUsername fn got us from its query of DB
+      if(err) {return done(err);}
+      if(!user){
+        console.log('Unknow User');
+        return done(null, false,{message: 'Unknown User'}); // null means no err and false means no username found
+      }
+      
+      // this is to compare password sent by user and that in the DB
+      User.comparePassword(password, user.password, function(err, isMatch){
+        console.log(password);
+        console.log(username);
+        console.log(user.password);
+        console.log(user.username);
+        // if(err) throw err;
+        if(isMatch){
+          return done(null, user);
+        } else {
+          console.log('Invalid Password');
+          return done(null, false, {message:'Invalid Password'}); // null means no err and false means no password=DBpassword for that user found
+        }
+      });
+
+    }); // end of getUserByUsername
+  } // currently now am using different error to know if getUserByUsername is working and comparePassword for debugging but would use same err later
+)); // end of user authenticatation 
+
+// this is to use passport keep user in session connected to DB using Users id
 passport.serializeUser(function(User, done){
-  done(null, User.id);
+  done(null, User._id);
 });
 
 passport.deserializeUser(function(id, done){
@@ -129,31 +163,6 @@ passport.deserializeUser(function(id, done){
     done(err, user);
   });
 });
-
-// for login check on local DB
-passport.use(new localStrategy(
-  function(username, password, done){
-    User.getUserByUsername(username, function(err, User){
-      if(err) throw err;
-      if(!User){
-        console.log('Unknow User');
-        return done(null, false,{message: 'Unknown User'});
-      }
-
-      // this is to compare password sent by user and that in the DB
-      User.comparePassword(password,User.password, function(err, isMatch){
-        if(err) throw err;
-        if(isMatch){
-          return done(null, user);
-        } else {
-          console.log('Invalid Password');
-          return done(null, false, {message:'Invalid Password'});
-        }
-      });
-
-    });
-  }
-));
 
 // this is to get router to the logout function and redirect to login page
 router.get('/logout', function(req, res){
