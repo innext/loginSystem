@@ -4,9 +4,9 @@ block content
     h1 Login
     p Please Login  below
     form(action="/users/login", method="post", enctype='multipart/form-data')
-        .form-group
+        .form-group#focus
             label Username
-            input.form-control(name="username", type="text", placeholder="Username", minlength="3", maxlength="14")
+            input.form-control#focus(name="username", type="text", autofocus, placeholder="Username", minlength="3", maxlength="14")
         .form-group
             label Password
             input.form-control(name="password", type="password", placeholder="Enter Password", minlength="10", maxlength="35")

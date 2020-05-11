@@ -8,9 +8,9 @@ block content
             each error, i in errors
                 li.alert.alert-danger #{error.msg}
     form(action="/users/register", method="post", enctype='multipart/form-data')
-        .form-group
+        .form-group#focus
             label Name
-            input.form-control(name="name", type="text", placeholder="Enter Name", minlength="4", maxlength="30")
+            input.form-control#focus(name="name", type="text", autofocus, placeholder="Enter Name", minlength="4", maxlength="30")
         .form-group
             label Email
             input.form-control(name="email", type="email", placeholder="Enter Email", minlength="11", maxlength="35")

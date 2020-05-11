@@ -1,23 +1,34 @@
 doctype html
 html
   head
-    title= 'Login System'
-  link(rel='stylesheet', href="/public/stylesheets/..")
-  link(rel='stylesheet', href='/public/stylesheets/style.css')
+    title= 'Kola-Adelakin Inioluwa'
+  link(href="../public/vendor/bootstrap/css/bootstrap.css.map" rel="stylesheet")
+  link(rel='stylesheet', href="../public/stylesheets/bootstrap.min.css")
+  link(rel='stylesheet', href='../public/stylesheets/bootstrap.css')
+  link(href="../public/vendor/fontawesome-free/css/all.min.css" rel="stylesheet")
+  link(href="../public/vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" type="text/css")
+  link(href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css")
+  link(href="../public/stylesheets/landing-page.min.css" rel="stylesheet")
+  link(href="../public/vendor/ionicons/css/ionicons.min.css" rel="stylesheet")
   body
       nav.navbar.navbar-default.navbar-fixed-top
         .container
           .navbar-header
             button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#navbar',aria-expanded="false", aria-controls='navbar')
               span.sr-only Toggle Navigation
-              span.icon-bar
-              span.icon-bar
-              span.icon-bar
-            a.navbar-brand(href='#') NodeAuth
+              span.ion-toggle
+              span.ion-toggle
+              span.ion-toggle
+            a.navbar-brand#logo(href='#')
+               img#logo(src='../public/pic/logo.png' alt='logo' width='80px' height='40px')
           #navbar.collapse.navbar-collapse
             ul.nav.navbar-nav
               li(class=(title == 'Members' ? 'active' : ''))
                 a(href='/') Members
+              li(class=(title == 'Portfolio' ? 'active' : ''))
+                a(href='/portfolio') Portfolio
+              li(class=(title == 'NeedGF' ? 'active' : ''))
+                a(href='/needgf') NeedGF
               //- to check if the user is logged in and if yes dont show the register and the login tab
               if !user 
                 li(class=(title == 'Register' ? 'active' : ''))
@@ -31,6 +42,6 @@ html
       .container
         //- != messages()
         block content
-
-  script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jguery.min.js")
-  script(src="/public/javascripts/bootstrap.js")
+  script(src="../public/javascripts/bootstrap.js")
+  script(src="../public/vendor/jquery/jquery.min.js")
+  script(src="../public/vendor/bootstrap/js/bootstrap.bundle.min.js")
