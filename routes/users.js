@@ -17,7 +17,9 @@ var User = require('../routes/models/user');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('Still working on it..:-(, wait, i want to make sure registration and login are good to go first');
+  res.render('index.html', {
+    'title' : 'Welcome'
+  });
 }); // end of GET / or Home page
 
 // GET /register page then render register.pug
@@ -54,10 +56,20 @@ router.post('/register', function(req, res, next) {
    // end of input field into containers
 
   // this is the real validation step of the input and check length, not empty password match
-  check('name', 'Name is required').not().isEmpty().isAlphaLocales().isLength({min: 4, max: 30});
-  check('email', 'Email is required').not().isEmpty().isLength({min: 11, max: 35});
+  check('name', 'Name is required').not().isEmpty().isAlphaLocales().whitelist('q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'l', 'k', 'j', 'h', 'g', 'f', 'd', 's', 'a', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '-').isLength({min: 4, max: 30});
+  check('email', 'Email is required').not().isEmpty().normalizeEmail().isLength({min: 11, max: 35});
   // this is to check if its an email
-  check('email', 'Email not valid').isEmail();
+  check('email', 'Email not valid').isEmail().custom((value, {req}) => {
+    return new Promise((resolve, reject) => 
+    {User.findOne({email: req.body.email}, function(err, user){
+      if(err){reject(new Error('Server Error'));
+    }if(Boolean(user)){
+      reject(new Error ('Email in Use'));
+    }
+     resolve(true);
+    });
+  });
+  });
   check('username', 'Username is required').not().isEmpty().isAlpha().isAlphanumericLocales().isLength({min:3, max:14});
   check('password', 'Password is required').not().isEmpty().isLength({min:10, max: 35});
   // to check if password match with password2
@@ -83,9 +95,15 @@ router.post('/register', function(req, res, next) {
       email: email,
       username: username,
       password: password,
-      profileimage: profileImageName
+      profileImage: profileImageName,
+      profileImageMime: profileImageMime,
+      profileImageSize: profileImageSize,
+      admin: false,
+      active: false
     });
     console.log(`${newUser}`);
+    // this is to check if the username and email is register before calling the createuser that we hash and save
+
     // because we dont want to save password like that and we want to hash it we then call 
     // createUser in our User model that would do the hashing for us replace the password field with the hashed
     // then calls on the .save to save to our MongoDB
@@ -94,6 +112,8 @@ router.post('/register', function(req, res, next) {
       console.log(user);
       console.log(`${password}`);
       console.log(user.password);
+      console.log(user.profileImageMime);
+      console.log(user.profileImageSize);
     });
     // end of creation of new user
     // sucess message to tell the user, user was created
@@ -115,9 +135,14 @@ router.get('/login', function(req, res, next) {
 // POST /login req then
 // use passport to authentictae the user after getting the user from the DB
 // and if the user is not found in DB or it failed maybe because incorrect PW send Invalid username or password
-router.post('/login', passport.authenticate('local', {failureRedirect:'/users/login', failureFlash:'Invalid username or password'}), function(req, res){
+router.post('/login', passport.authenticate('local', {
+  failureRedirect:'/users/login',
+  failureFlash:'Invalid username or password',
+  session:true
+}), function(req, res){
   //passport.authenticate is telling passport to authenticate the user locally and err msg and redirect if was unable to authenticate user
   console.log('Authentication Successful');
+
   req.flash('success', 'You are logged in');
   res.redirect('/');
 }); //end of POST /login
@@ -140,6 +165,8 @@ passport.use(new localStrategy( // localStrategy is what we using to check user 
         console.log(username);
         console.log(user.password);
         console.log(user.username);
+        console.log(user.profileimage);
+        console.log(user.session);
         // if(err) throw err;
         if(isMatch){
           return done(null, user);
@@ -163,6 +190,70 @@ passport.deserializeUser(function(id, done){
     done(err, user);
   });
 });
+
+
+router.get('/find', (req, res) => {
+  var query = req.query;
+  // let filters = null;                    // this is just an example of how to use filter in query
+  // if (req.query.age !=null){
+  //   filters = {
+  //     age: {$gt:req.query.age }
+  //   };
+  //  }
+  User.find(query).then(users => {
+    res.json({
+      confirmation: 'suceess',
+      data: users
+    });
+  }).catch(err => {
+    res.json({
+      confirmation: 'fail',
+      message: err.message
+    });
+  });
+});
+
+
+router.get('/update', (req, res) => {
+  var query = req.query;
+  var profileId = query.id;
+  delete query['id'];
+
+  Profile.findByIdAndUpdate(profileId,query, {new:true})
+  .then(profile => {
+    res.json({
+      confirmation: 'success',
+      data: profile
+    });
+  })
+  .catch( err => {
+    res.json({
+      confirmation: 'fail',
+      message: err.message
+    });
+  }
+
+  );
+});
+
+// this is to one profile with the profile id which can change thats why we used :id
+ router.get('/profile/:id', (req, res) => {
+   var id = req.params.id;
+   
+   Profile.findById(id)
+   .then(profiles => {
+     res.json({
+       confirmation: 'success',
+       data: profiles
+     });
+   }).catch(err => {
+     res.json({
+       confirmation:'fail',
+       message: 'profile ' + id + ' not found'
+     });
+   });
+ });
+
 
 // this is to get router to the logout function and redirect to login page
 router.get('/logout', function(req, res){
