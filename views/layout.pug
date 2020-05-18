@@ -8,35 +8,27 @@ html
   link(href="../public/vendor/fontawesome-free/css/all.min.css" rel="stylesheet")
   link(href="../public/vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" type="text/css")
   link(href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css")
-  link(href="../public/stylesheets/landing-page.css" rel="stylesheet")
+  link(href="../public/stylesheets/landing-page.min.css" rel="stylesheet")
   link(href="../public/vendor/ionicons/css/ionicons.min.css" rel="stylesheet")
   body
-      //- <nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
-      //-       <div class="container">
-      //-           <a class="navbar-brand js-scroll-trigger" href="#page-top">Start Bootstrap</a><button class="navbar-toggler navbar-toggler-right text-uppercase font-weight-bold bg-primary text-white rounded" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">Menu <i class="fas fa-bars"></i></button>
-      //-           <div class="collapse navbar-collapse" id="navbarResponsive">
-      //-               <ul class="navbar-nav ml-auto">
-      //-                   <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#portfolio">Portfolio</a></li>
-      //-                   <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#about">About</a></li>
-      //-                   <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#contact">Contact</a></li>
-      //-               </ul>
-      //-           </div>
-      //-       </div>
-      //-   </nav>
       nav.navbar.navbar-default.navbar-fixed-top
         .container
           .navbar-header
             button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#navbar',aria-expanded="false", aria-controls='navbar')
               span.sr-only Toggle Navigation
-              span.ion-ios-more
-              //.ion-ios-minus-outline
-             
+              span.ion-toggle
+              span.ion-toggle
+              span.ion-toggle
             a.navbar-brand#logo(href='#')
                img#logo(src='../public/pic/logo.png' alt='logo' width='80px' height='40px')
           #navbar.collapse.navbar-collapse
             ul.nav.navbar-nav
               li(class=(title == 'Members' ? 'active' : ''))
                 a(href='/') Members
+              li(class=(title == 'Portfolio' ? 'active' : ''))
+                a(href='/portfolio') Portfolio
+              li(class=(title == 'NeedGF' ? 'active' : ''))
+                a(href='/needgf') NeedGF
               //- to check if the user is logged in and if yes dont show the register and the login tab
               if !user 
                 li(class=(title == 'Register' ? 'active' : ''))
@@ -45,48 +37,11 @@ html
                   a(href='/users/login') Log In
             ul.nav.navbar-nav.navbar-right
               if user
-                li(class=(title == 'Portfolio' ? 'active' : ''))
-                  a(href='/portfolio') Portfolio
-                li(class=(title == 'NeedGF' ? 'active' : ''))
-                  a(href='/needgf') NeedGF
                 li
                   a(href='/users/logout') Logout
       .container
         //- != messages()
         block content
-  // Footer
-footer.footer.bg-light
-  .container
-    .row
-      .col-lg-6.h-100.text-center.text-lg-left.my-auto
-        ul.list-inline.mb-2
-          li.list-inline-item
-            a(href='#') About
-          li.list-inline-item &sdot;
-          li.list-inline-item
-            a(href='#') Contact
-          li.list-inline-item &sdot;
-          li.list-inline-item
-            a(href='#') NeedGF
-          li.list-inline-item &sdot;
-          li.list-inline-item
-            a(href='#') Terms of Use
-          li.list-inline-item &sdot;
-          li.list-inline-item
-            a(href='#') Privacy Policy
-        p.text-muted.small.mb-4.mb-lg-0 &copy; Innext Website 2020. All Rights Reserved.
-      .col-lg-6.h-100.text-center.text-lg-right.my-auto
-        ul.list-inline.mb-0
-          li.list-inline-item.mr-3
-            a(href='https://linkedin.com/Innextinit')
-              i.fab.fa-linkedin.fa-2x.fa-fw
-          li.list-inline-item.mr-3
-            a(href='https://twitter.com/Innextinit')
-              i.fab.fa-twitter-square.fa-2x.fa-fw
-          li.list-inline-item
-            a(href='https://whatsapp.com/Innextinit')
-              i.fab.fa-whatsapp.fa-2x.fa-fw
-  // Bootstrap core JavaScript
   script(src="../public/javascripts/bootstrap.js")
   script(src="../public/vendor/jquery/jquery.min.js")
   script(src="../public/vendor/bootstrap/js/bootstrap.bundle.min.js")

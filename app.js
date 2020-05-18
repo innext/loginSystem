@@ -1,7 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-const {check, validationResult} = require('express-validator/check');
+const {check, validationResult} = require('express-validator');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bcrypt = require('bcrypt');
@@ -38,12 +38,12 @@ app.use(multer({
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(require('serve-static')(__dirname + '/../../public'));
 app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({extended: true}));
 // Handle Express Sessions
 app.use(require('express-session')({
-  secret: 'mysecret', // this is wrong, it should be in a file and make req to the file and when pushing to github should not be pushed along e.g "var secret = require('/node_modules/config/secret'); or make env variable"
+  secret: 'mysecret', // this is wrong, it should be in a file and make req to the file and when pushing to github should not be pushed along e.g "var secret = require('/node_modules/config/secret');"
   saveUninitialized: true,
   resave: true
 }));
@@ -81,6 +81,7 @@ app.get('*', function(req, res, next){
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

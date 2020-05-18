@@ -63,6 +63,11 @@ body {
   background-color: #fff;
 }
 
+img #logo{
+  width: 80px;
+  height: 40px;
+}
+
 [tabindex="-1"]:focus {
   outline: 0 !important;
 }

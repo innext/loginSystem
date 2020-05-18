@@ -7,7 +7,7 @@ block content
         if errors
             each error, i in errors
                 li.alert.alert-danger #{error.msg}
-    form.form(action="/users/register", method="post", enctype='multipart/form-data')
+    form(action="/users/register", method="post", enctype='multipart/form-data')
         .form-group#focus
             label Name
             input.form-control#focus(name="name", type="text", autofocus, placeholder="Enter Name", minlength="4", maxlength="30")
