@@ -1,0 +1,25 @@
+extends layout
+
+block content
+    h1 Edit Profile
+    p Please Edit Profile using the form below
+    ul.errors
+        if errors
+            each error, i in errors
+                li.alert.alert-danger #{error.msg}
+    form.form(action="/users/edit?q=_method='PUT'", method="post", enctype='multipart/form-data')
+        .form-group
+            label Profile Image
+            img(src='', alt="Profile Image", srcset="'../public/pic/images.jpeg 25w', '../public/pic/web boss icon.png'")
+            //- input.form-control(name="profileImage", value='user.profileImagePath', enctype="multipart/form-data", type="file", size="4mb", autofocus)
+        .form-group
+            label Username
+            input.form-control(name="username", type="text", value=user.username, minlength="3", maxlength="14")
+        .form-group
+            label Name
+            input.form-control#focus(name="name", type="text", value=user.name, minlength="4", maxlength="30")
+        .form-group
+            label Email
+            input.form-control(name="email", type="email", value=user.email, minlength="11", maxlength="35")
+        
+        input.btn.btn-default(name="submit", type="submit", value="Edit Profile")

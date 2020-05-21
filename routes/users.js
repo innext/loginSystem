@@ -17,7 +17,9 @@ var User = require('../routes/models/user');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('Still working on it..:-(, wait, i want to make sure registration and login are good to go first');
+  res.render('index', {
+    'title' : 'Welcome'
+  });
 }); // end of GET / or Home page
 
 // GET /register page then render register.pug
@@ -38,34 +40,43 @@ router.post('/register', function(req, res, next) {
   var username = req.body.username;
   var password = req.body.password;
   var password2 = req.body.password2;
-  console.log(`${name}, ${email}, ${username}, ${password}`);
-  var profileImageName = req.file.originalname;
-  var profileImageMime = req.file.mimetype;
-  var profileImagePath = req.file.path;
-  var profileImageext = req.file.extension;
-  var profileImageSize = req.file.size;
-  // this to check if this is working
-  console.log(`${profileImageName}, ${profileImageMime}, ${profileImagePath}, ${profileImageext}, ${profileImageSize}`);
-  // This is to check the image file and give it my own name and other ppt.
-  if(!req.file) {
-    var profileImageName = 'noimage.png';
-    console.log(`${profileImageName}`);
-   }
-   // end of input field into containers
+  var ipAddress = req.connection.address();
+  console.log(`${name}, ${email}, ${username}, ${password}, ${ipAddress}`);
+  // end of input field into containers
 
   // this is the real validation step of the input and check length, not empty password match
   check('name', 'Name is required').not().isEmpty().isAlphaLocales().isLength({min: 4, max: 30});
-  check('email', 'Email is required').not().isEmpty().isLength({min: 11, max: 35});
-  // this is to check if its an email
-  check('email', 'Email not valid').isEmail();
-  check('username', 'Username is required').not().isEmpty().isAlpha().isAlphanumericLocales().isLength({min:3, max:14});
+  check('email', 'Email is required').not().isEmpty().normalizeEmail().isLength({min: 11, max: 35});
+  // this is to check if its an email and if not in use
+  check('email', 'Email not valid').isEmail().custom((value, {req}) => {
+    return new Promise((resolve, reject) => 
+    {User.findOne({email: req.body.email}, function(err, user){
+      if(err){reject(new Error('Server Error'));
+    }if(Boolean(user)){
+      reject(new Error ('Email in Use'));
+    }
+     resolve(true);
+    });
+  });
+  });
+  check('username', 'Username is required').not().isEmpty().isAlpha().isAlphanumericLocales().isLength({min:3, max:14})
+    .custom((value, {req}) => {
+      return new Promise((resolve, reject) => 
+      {User.findOne({username: req.body.username}, function(err, user){
+        if(err){reject(new Error('Server Error'));
+      }if(Boolean(user)){
+        reject(new Error ('Username in Use'));
+      }
+      resolve(true);
+      });
+    });
+    });
   check('password', 'Password is required').not().isEmpty().isLength({min:10, max: 35});
   // to check if password match with password2
   check('password2', 'Password do not match, please check').equals(req.body.password);
-  check('profileImage', 'Profile Image is required').not().isEmpty();
   // end of the real validation
 
-// check for errors during the validation
+  // check for errors during the validation
   const errors = validationResult(req);
   if(!errors.isEmpty()){ // if there was error during validation return to registration page and help fill the input back with the users input
     return res.render('register').json({
@@ -83,7 +94,9 @@ router.post('/register', function(req, res, next) {
       email: email,
       username: username,
       password: password,
-      profileimage: profileImageName
+      ipAddress: ipAddress,
+      admin: false,
+      active: false
     });
     console.log(`${newUser}`);
     // because we dont want to save password like that and we want to hash it we then call 
@@ -94,8 +107,8 @@ router.post('/register', function(req, res, next) {
       console.log(user);
       console.log(`${password}`);
       console.log(user.password);
-    });
-    // end of creation of new user
+      console.log(user.ipAddress);
+    });   // end of creation of new user
     // sucess message to tell the user, user was created
     req.flash('success', 'You now registered, may login ;)' );
     //after the message the page will be redirected to home page
@@ -115,7 +128,7 @@ router.get('/login', function(req, res, next) {
 // POST /login req then
 // use passport to authentictae the user after getting the user from the DB
 // and if the user is not found in DB or it failed maybe because incorrect PW send Invalid username or password
-router.post('/login', passport.authenticate('local', {failureRedirect:'/users/login', failureFlash:'Invalid username or password'}), function(req, res){
+router.post('/login', passport.authenticate('local', {failureRedirect:'/users/login', failureFlash:'Invalid username or password', session: true}), function(req, res){
   //passport.authenticate is telling passport to authenticate the user locally and err msg and redirect if was unable to authenticate user
   console.log('Authentication Successful');
   req.flash('success', 'You are logged in');
@@ -136,11 +149,12 @@ passport.use(new localStrategy( // localStrategy is what we using to check user 
       
       // this is to compare password sent by user and that in the DB
       User.comparePassword(password, user.password, function(err, isMatch){
+        // var ipAddress = user.ips;  // user.headers['x-forwarded-for'] || user.headers["content-location"] && user.ip || user.connection.remoteAddress;
         console.log(password);
         console.log(username);
         console.log(user.password);
         console.log(user.username);
-        // if(err) throw err;
+         // if(err) throw err;
         if(isMatch){
           return done(null, user);
         } else {
@@ -163,6 +177,24 @@ passport.deserializeUser(function(id, done){
     done(err, user);
   });
 });
+
+// GET /edit page then render edit.pug
+router.get('/edit', function(req, res, next) {
+  res.render('edit', {
+    'title' : 'Update Profile'
+  });
+}); // end of GET /edit
+
+// router.put('/edit', req, res, next) => {
+//   User.findByIdAndUpdate(User.id, update, {new:true})
+//   .then(
+//     user => {
+
+//   )
+//   .catch();
+// }
+
+
 
 // this is to get router to the logout function and redirect to login page
 router.get('/logout', function(req, res){

@@ -11,7 +11,8 @@ var db = mongoose.connection;
 var UserSchema = mongoose.Schema({
     username : {
         type: String,
-        index: true,
+        index: {unique: true},
+        trim: true,
         require: true
     },
     password : {
@@ -19,16 +20,21 @@ var UserSchema = mongoose.Schema({
     },
     email : {
         type: String,
-        require: true
+        require: true,
+        trim: true,
+        index: {unique: true}
     },
     name : {
         type: String,
+        trim: true,
         require: true
     },
-    profileimage : {
-        type: String,
+    ipAddress : {
+        type: Object,
         require: true
-    }
+    },
+    admin: Boolean,
+    active: Boolean
 });
 
 // this is to convert this UserSchema in a usable model called User
