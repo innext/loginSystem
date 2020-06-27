@@ -1,18 +1,10 @@
 var createError = require('http-errors');
 var express = require('express');
-var path = require('path');
 var router = express.Router();
 const { check, validationResult } = require('express-validator/check');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var bcrypt = require('bcrypt');
 var passport = require('passport');
 var localStrategy = require('passport-local').Strategy;
-var facebook = require('passport-facebook');
-var google = require('passport-google');
-var twitter = require('passport-twitter');
-var linkedin = require('passport-linkedin');
-var bodyParser = require('body-parser');
 var User = require('../routes/models/user');
 
 /* GET users listing. */
@@ -179,9 +171,16 @@ passport.deserializeUser(function(id, done){
 });
 
 // GET /edit page then render edit.pug
-router.get('/edit', function(req, res, next) {
-  res.render('edit', {
-    'title' : 'Update Profile'
+router.get('/:id/edit', function(req, res, next) {
+  User.getUserById(req.params.id, function(err, userId){
+    if(err){
+      res.redirect(back);
+    } else {
+      res.render('edit', {
+        userId: userId,
+        'title' : 'Update Profile'
+      });
+    }
   });
 }); // end of GET /edit
 

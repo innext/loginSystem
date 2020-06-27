@@ -1,6 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var methodOverride = require('method-override');
 const {check, validationResult} = require('express-validator/check');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -32,6 +33,7 @@ app.set('view engine', 'pug');
 // Handle File Upload
 // multer helps to do file upload and it will send to destination file named upload
 
+app.use(methodOverride('_method'));
 app.use(multer({
   dest:'uploads/'
 }).single('profileImage'));
@@ -67,9 +69,10 @@ app.use(require('express-validator')({
     };
   }
 }));
+// connect-flash
 app.use(require('connect-flash')());
 app.use(function (req, res, next) {
-  res.locals.message = require('express-message')(req, res);
+  res.locals.messages = require('express-message')(req, res);
   next();
 });
 
@@ -100,6 +103,6 @@ app.use(function(err, req, res, next) {
 
 module.exports = app;
 
-app.listen(2000, function(){
+app.listen(2000 || process.env.PORT, function(){
   console.log("server running on port 2000");
 });

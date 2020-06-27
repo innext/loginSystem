@@ -3,7 +3,7 @@ var bcrypt = require('bcrypt');
 
 // this is to connect to the DB on my localhost
  // nodeJSWorks is the name of my DB on my localhost
-mongoose.connect('MongoDB://localhost/nodeJSWorks');
+mongoose.connect(process.env.DB_URL || 'MongoDB://localhost/nodeJSWorks');
 
 var db = mongoose.connection;
 

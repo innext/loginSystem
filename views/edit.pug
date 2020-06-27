@@ -7,7 +7,7 @@ block content
         if errors
             each error, i in errors
                 li.alert.alert-danger #{error.msg}
-    form.form(action="/users/edit?q=_method='PUT'", method="post", enctype='multipart/form-data')
+    form.form(action='/users/'$userId._id'/edit?=_method=PUT', method="post", enctype='multipart/form-data')
         .form-group
             label Profile Image
             img(src='', alt="Profile Image", srcset="'../public/pic/images.jpeg 25w', '../public/pic/web boss icon.png'")
